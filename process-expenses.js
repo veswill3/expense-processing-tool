@@ -60,7 +60,7 @@ Promise.all([getConversionRatesPromise, getExpenseFilePromise])
             // define current region
             region = /[^#]+/.exec(line)[0].trim();
             if (config.debug) console.log('Switching region to ' + region);
-        } else if (line.substr(0,4) === '----') {
+        } else if (line.substr(0,3) === '---') {
             // define current date
             var dateStr = /[^-]+/.exec(line)[0].trim().split('/');
             var month = pad(dateStr[0]);
@@ -69,14 +69,24 @@ Promise.all([getConversionRatesPromise, getExpenseFilePromise])
             if (config.debug) console.log('Switching date to ' + date);
         } else {
             // process normal line
-            // ### [code] [comment] > [region]\t[date]\t[$$$]\t[category]\t[comment]
+            // ### [code] [comment] > [region]\t[date]\t[$$$]\t\t[comment]
             var amount = /[\d|.]+/.exec(line)[0];
             var ret = /[A-Z]+/.exec(line);
             var code = ret[0];
             var conversion = 1 / conversionRates['USD' + code];
             amount = round(amount * conversion, 2).toFixed(2);
             var comment = line.substr(ret.index + code.length + 1);
-            console.log(region + '\t' + date + '\t' + amount + '\t\t' + comment);
+            var category = '';
+            if (comment.toLowerCase() === 'dinner') {
+                comment = '';
+                category = 'Dinner';
+            } else if (comment.toLowerCase() === 'lunch') {
+                comment = '';
+                category = 'Lunch';
+            } else if (comment.toLowerCase().indexOf('beer') !== -1) {
+                category = 'Bar/Alcohol';
+            }
+            console.log(region + '\t' + date + '\t' + amount + '\t' + category + '\t' + comment);
         }
     });
     console.log('---------- copy above here ----------');
