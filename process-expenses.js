@@ -56,6 +56,7 @@ Promise.all([getConversionRatesPromise, getExpenseFilePromise])
 
     console.log('---------- copy below here ----------');
     expenseFile.forEach(function(line) {
+        if (line === '') return; // skip blank lines
         if (line.substr(0,3) === '###') {
             // define current region
             region = /[^#]+/.exec(line)[0].trim();
