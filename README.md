@@ -4,6 +4,7 @@ Create a `config.js` file like this:
 ```js
 module.exports = {
     apilayer_access_key: 'my-secret-api-key',
+    default_filename: 'raw-data',
     default_region: 'Murica',
     debug: false
 };

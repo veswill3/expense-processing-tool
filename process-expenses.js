@@ -1,9 +1,5 @@
-if (!process.argv[2]) {
-    console.error('You must specify a filename to process as an argument.');
-    process.exit(1);
-}
 const config = require('./config');
-const filename = process.argv[2];
+const filename = process.argv[2] ? process.argv[2]: config.default_filename;
 
 // Download current currency conversion rates
 var getConversionRatesPromise = new Promise(function(resolve, reject) {
