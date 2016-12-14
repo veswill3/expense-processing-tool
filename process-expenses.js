@@ -74,13 +74,16 @@ Promise.all([getConversionRatesPromise, getExpenseFilePromise])
             amount = round(amount * conversion, 2).toFixed(2);
             var comment = line.substr(ret.index + code.length + 1);
             var category = '';
-            if (comment.toLowerCase() === 'dinner') {
+            var lcaseComment = lcaseComment;
+            if (lcaseComment === 'dinner') {
                 comment = '';
                 category = 'Dinner';
-            } else if (comment.toLowerCase() === 'lunch') {
+            } else if (lcaseComment === 'lunch') {
                 comment = '';
                 category = 'Lunch';
-            } else if (comment.toLowerCase().indexOf('beer') !== -1) {
+            } else if (lcaseComment === 'water' || lcaseComment === 'breakfast') {
+                category = 'Food';
+            } else if (lcaseComment.indexOf('beer') !== -1) {
                 category = 'Bar/Alcohol';
             }
             console.log(region + '\t' + date + '\t' + amount + '\t' + category + '\t' + comment);
