@@ -74,7 +74,7 @@ Promise.all([getConversionRatesPromise, getExpenseFilePromise])
             amount = round(amount * conversion, 2).toFixed(2);
             var comment = line.substr(ret.index + code.length + 1);
             var category = '';
-            var lcaseComment = lcaseComment;
+            var lcaseComment = comment.toLowerCase();
             if (lcaseComment === 'dinner') {
                 comment = '';
                 category = 'Dinner';
