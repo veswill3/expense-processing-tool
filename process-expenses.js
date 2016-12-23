@@ -72,20 +72,32 @@ Promise.all([getConversionRatesPromise, getExpenseFilePromise])
             var code = ret[0];
             var conversion = 1 / conversionRates['USD' + code];
             amount = round(amount * conversion, 2).toFixed(2);
-            var comment = line.substr(ret.index + code.length + 1);
+            var comment = line.substr(ret.index + code.length + 1).trim();
             var category = '';
-            var lcaseComment = comment.toLowerCase();
-            if (lcaseComment === 'dinner') {
-                comment = '';
-                category = 'Dinner';
-            } else if (lcaseComment === 'lunch') {
-                comment = '';
-                category = 'Lunch';
-            } else if (lcaseComment === 'water' || lcaseComment === 'breakfast') {
-                category = 'Food';
-            } else if (lcaseComment.indexOf('beer') !== -1) {
-                category = 'Bar/Alcohol';
+
+            switch (comment.toLowerCase()) {
+                case 'dinner':
+                    comment = '';
+                    category = 'Dinner';
+                    break;
+                case 'lunch':
+                    comment = '';
+                    category = 'Lunch';
+                    break;
+                case 'water':
+                case 'breakfast':
+                    category = 'Food';
+                    break;
+                case "groceries":
+                    comment = '';
+                    category = 'Groceries';
+                    break;
+                default:
+                    if (comment.toLowerCase().indexOf('beer') !== -1) {
+                        category = 'Bar/Alcohol';
+                    }
             }
+
             console.log(region + '\t' + date + '\t' + amount + '\t' + category + '\t' + comment);
         }
     });
