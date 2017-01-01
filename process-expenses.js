@@ -62,7 +62,7 @@ Promise.all([getConversionRatesPromise, getExpenseFilePromise])
             var dateStr = /[^-]+/.exec(line)[0].trim().split('/');
             var month = pad(dateStr[0]);
             var day = pad(dateStr[1]);
-            date = '2016-' + month + '-' + day;
+            date = '2017-' + month + '-' + day;
             if (config.debug) console.log('Switching date to ' + date);
         } else {
             // process normal line
