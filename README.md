@@ -1,16 +1,14 @@
-A simple expense processing tool to convert my travel expense notes into something useable
+An expense tracking tool for my travels, written in react native.
 
-Create a `config.js` file like this:
+To make this work, create a `config.js` file in the root directory like this:
 ```js
 module.exports = {
-    apilayer_access_key: 'my-secret-api-key',
-    default_filename: 'raw-data',
-    default_region: 'Murica',
-    debug: false
+    apilayer_access_key: 'secret', // to convert currencies
+    google_form_key: 'secret', // to upload
 };
 ```
 
-to run:
+to build and install an APK for debug:
 ```sh
-$ node process-expenses.js filename
+./buildAPK.sh
 ```
