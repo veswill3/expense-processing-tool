@@ -6,7 +6,8 @@ import {
   Button,
   ListView,
   Alert,
-  AsyncStorage
+  AsyncStorage,
+  ActivityIndicator,
 } from 'react-native';
 const config = require('./config');
 
@@ -22,20 +23,23 @@ class ExpenseList extends Component {
     this.state = {
       dataSource: ds.cloneWithRows(['loading']),
       ds: ds,
+      uploading: false,
     };
     this.updateDisplay();
   }
   updateDisplay() {
-    AsyncStorage.getAllKeys((err, keys) => {
-      AsyncStorage.multiGet(keys, (err, stores) => {
-        if (stores.length === 0) {
-          this.setState({dataSource: this.state.ds.cloneWithRows(['No expenses.'])});
-          return;
-        } else {
-          this.setState({dataSource: this.state.ds.cloneWithRows(stores)});
-        }
-      });
-    }).catch(e => {console.warn(e)});
+    getExpenseDataPromise()
+    .then(stores => {
+      if (stores.length === 0) {
+        this.setState({dataSource: this.state.ds.cloneWithRows(['No expenses.'])});
+      } else {
+        this.setState({dataSource: this.state.ds.cloneWithRows(stores)});
+      }
+    })
+    .catch(e => {
+      console.log('we had an issue asdfasdfasdfdsaf');
+      console.warn(e)
+    });
   }
   uploadExpenses() {
     // AsyncStorage.clear().then(() => {
@@ -44,93 +48,82 @@ class ExpenseList extends Component {
     // });
     // return;
 
-    AsyncStorage.getAllKeys()
-      .then(keys => {
-        if (keys.length === 0) {
-          Alert.alert('No expenses to upload.');
-          return;
-        }
-        // Download current currency conversion rates
-        fetch('http://apilayer.net/api/live?access_key=' + config.apilayer_access_key)
-          .then(resp => resp.json()).then(data => {
-            let conversionRates = data.quotes;
-            AsyncStorage.multiGet(keys)
-              .then(stores => {
-                stores.forEach(store => {
-                  let key = store[0];
-                  let d = JSON.parse(store[1]);
-                  let newAmt = +round(d.amount * 1/conversionRates['USD' + d.currencyCode], 2).toFixed(2);
-                  let dateParts = d.date.split('-');
-                  let params = {
-                    'entry.1146702422': d.location,
-                    'entry.1922298015': newAmt,
-                    'entry.1408651527_year': +dateParts[0],
-                    'entry.1408651527_month': +dateParts[1],
-                    'entry.1408651527_day': +dateParts[2],
-                    'entry.1174471405': d.category,
-                    'entry.1664190829': d.comment
-                  };
-                  const formBody = Object.keys(params)
-                    .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(params[key]))
-                    .join('&');
-
-                  fetch('https://docs.google.com/forms/d/e/' + config.google_form_key + '/formResponse', {  
-                    method: 'POST',
-                    headers: {
-                      'Accept': 'application/json',
-                      'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: formBody
-                  }).then(response => {
-                      // check status is ok
-                      if (response.status >= 200 && response.status < 300) {
-                        return response;
-                      } else {
-                        let error = new Error(response.statusText);
-                        error.response = response;
-                        throw error;
-                      }
-                    })
-                    .then(response => {
-                      // this is the ~best~ only way I could think of to see if there was a form validation issue
-                      if (response['_bodyText'].indexOf('i.err.') > 0) {
-                        let error = new Error('I *think* the form validation had an error');
-                        throw error;
-                      } else {
-                        return response;
-                      }
-                    })
-                    .then(r => {
-                      // console.log(r);
-                      AsyncStorage.removeItem(key)
-                        .then(this.updateDisplay());
-                    })
-                    .catch(e => {
-                      console.log('there was an issue uploading an expense.');
-                      console.log(e);
-                      Alert.alert('there was an issue uploading an expense.');
-                    });
-                });
-              })
-              .catch(e => {
-                console.log('there was an issue processing an expense.');
-                console.log(e);
-                Alert.alert('there was an issue processing an expense.');
-              });
-          })
+    this.setState({uploading: true});
+    Promise.all([getConversionRatesPromise(), getExpenseDataPromise()])
+    .then(([convRates, expData]) => {
+      Promise.all(expData.map(store => {
+        return new Promise((resolve, reject) => {
+          let key = store[0];
+          let d = JSON.parse(store[1]);
+          let newAmt = +round(d.amount * 1/convRates['USD' + d.currencyCode], 2).toFixed(2);
+          let dateParts = d.date.split('-');
+          let params = {
+            'entry.1146702422': d.location,
+            'entry.1922298015': newAmt,
+            'entry.1408651527_year': +dateParts[0],
+            'entry.1408651527_month': +dateParts[1],
+            'entry.1408651527_day': +dateParts[2],
+            'entry.1174471405': d.category,
+            'entry.1664190829': d.comment
+          };
+          const formBody = Object.keys(params)
+            .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(params[key]))
+            .join('&');
+          fetch('https://docs.google.com/forms/d/e/' + config.google_form_key + '/formResponse', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Accept': 'application/json',
+            },
+            body: formBody
+          }).then(response => {
+            // error checks
+            if (response.status >= 200 && response.status < 300) {
+              // this is the ~best~ only way I could think of to see if there was a form validation issue
+              if (response['_bodyText'].indexOf('i.err.') > 0) {
+                let error = new Error('I *think* there was an issue with form validation');
+                throw error;
+              } else {
+                resolve(response);
+              }
+            } else {
+              let error = new Error(response.statusText);
+              error.response = response;
+              throw error;
+            }
+          }).then(() => AsyncStorage.removeItem(key))
           .catch(e => {
-            console.log('there was an issue retrieving currency conversion info.');
-            console.log(e)
-            Alert.alert('there was an issue retrieving currency conversion info.');
+            // I am not rejecting on purpse - so promise.all will still process the others
+            console.log('there was an issue uploading an expense.');
+            console.log(e);
           });
+        });
+      }))
+      .then(() => {
+        this.updateDisplay();
+        this.setState({uploading: false});
       })
       .catch(e => {
-        console.log('there was an issue retrieving storage keys.');
+        console.log('there was an issue uploading expenses.');
         console.log(e);
-        Alert.alert('there was an issue retrieving storage keys.');
+        Alert.alert('there was an issue uploading expenses.');
       });
+    })
+    .catch(e => {
+      console.log('Unable to get conversion rates or access expense data.');
+      console.log(e)
+      Alert.alert('Unable to get conversion rates or access expense data.');
+    });
   }
   render() {
+    if (this.state.uploading) {
+      return (
+        <ActivityIndicator
+          animating={this.state.uploading}
+          size="large"
+        />
+      );
+    }
     return (
       <View style={styles.container}>
         <View style={[styles.header]}>
@@ -246,6 +239,27 @@ const styles = StyleSheet.create({
   },
 });
 
+var getConversionRatesPromise = function() {
+  return new Promise((resolve, reject) => {
+      fetch('http://apilayer.net/api/live?access_key=' + config.apilayer_access_key)
+      .then(resp => resp.json())
+      .then(data => resolve(data.quotes))
+      .catch(reject);
+  });
+};
+
+var getExpenseDataPromise = function() {
+  return new Promise((resolve, reject) => {
+    AsyncStorage.getAllKeys()
+    .then(keys => {
+      // filter keys here
+      return AsyncStorage.multiGet(keys);
+    })
+    .then(resolve)
+    .catch(reject);
+  });
+};
+
 function round(value, exp) {
   if (typeof exp === 'undefined' || +exp === 0)
     return Math.round(value);
@@ -264,6 +278,5 @@ function round(value, exp) {
   value = value.toString().split('e');
   return +(value[0] + 'e' + (value[1] ? (+value[1] - exp) : -exp));
 }
-
 
 module.exports = ExpenseList;

@@ -17,10 +17,10 @@ class ExpenseDetail extends Component {
     super(props);
     // default
     this.state = {
-      location: 'Thailand',
+      location: 'Malaysia',
       date: new Date().toISOString().split('T')[0],
       amount: null,
-      currencyCode: 'THB',
+      currencyCode: 'MYR',
       category: null,
       comment: '',
       loaded: true // for now...
@@ -70,8 +70,8 @@ class ExpenseDetail extends Component {
     AsyncStorage.setItem(key, JSON.stringify(this.state))
       .then(() => this.props.navigator.push({id: 'list', title: 'Expense List'}))
       .catch(e => {
-        this.setState({error: error});
-        Alert.alert('Something went wrong.\n' + error);
+        this.setState({error: e});
+        Alert.alert('Something went wrong.\n' + e);
       });
   }
   render() {
@@ -95,9 +95,10 @@ class ExpenseDetail extends Component {
               style={{flex: 1}}
               selectedValue={this.state.location}
               onValueChange={(loc) => this.setState({location: loc})}>
-              <Picker.Item label="Thailand" value="Thailand" />
+              <Picker.Item label="Malaysia" value="Malaysia" />
               <Picker.Item label="Indonesia" value="Indonesia" />
               <Picker.Item label="Place to Place" value="Place to Place" />
+              <Picker.Item label="Thailand" value="Thailand" />
             </Picker>
 
             <TextInput
@@ -121,8 +122,10 @@ class ExpenseDetail extends Component {
               style={{width: 100}}
               selectedValue={this.state.currencyCode}
               onValueChange={(code) => this.setState({currencyCode: code})}>
-              <Picker.Item label="THB" value="THB" />
+              <Picker.Item label="MYR" value="MYR" />
+              <Picker.Item label="IDR" value="IDR" />
               <Picker.Item label="USD" value="USD" />
+              <Picker.Item label="THB" value="THB" />
             </Picker>
           </View>
 
