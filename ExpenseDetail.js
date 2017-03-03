@@ -96,6 +96,7 @@ class ExpenseDetail extends Component {
               selectedValue={this.state.location}
               onValueChange={(loc) => this.setState({location: loc})}>
               <Picker.Item label="Malaysia" value="Malaysia" />
+              <Picker.Item label="Singapore" value="Singapore" />
               <Picker.Item label="Indonesia" value="Indonesia" />
               <Picker.Item label="Place to Place" value="Place to Place" />
               <Picker.Item label="Thailand" value="Thailand" />
@@ -123,6 +124,7 @@ class ExpenseDetail extends Component {
               selectedValue={this.state.currencyCode}
               onValueChange={(code) => this.setState({currencyCode: code})}>
               <Picker.Item label="MYR" value="MYR" />
+              <Picker.Item label="SGD" value="SGD" />
               <Picker.Item label="IDR" value="IDR" />
               <Picker.Item label="USD" value="USD" />
               <Picker.Item label="THB" value="THB" />
