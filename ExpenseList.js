@@ -27,13 +27,16 @@ class ExpenseList extends Component {
     };
     this.updateDisplay();
   }
-  updateDisplay() {
+  updateDisplay(newState) {
     getExpenseDataPromise()
     .then(stores => {
       if (stores.length === 0) {
         this.setState({dataSource: this.state.ds.cloneWithRows(['No expenses.'])});
       } else {
         this.setState({dataSource: this.state.ds.cloneWithRows(stores)});
+      }
+      if (newState) {
+        this.setState(newState);
       }
     })
     .catch(e => {
@@ -100,19 +103,20 @@ class ExpenseList extends Component {
         });
       }))
       .then(() => {
-        this.updateDisplay();
-        this.setState({uploading: false});
+        this.updateDisplay({uploading: false});
       })
       .catch(e => {
         console.log('there was an issue uploading expenses.');
         console.log(e);
         Alert.alert('there was an issue uploading expenses.');
+        this.updateDisplay({uploading: false});
       });
     })
     .catch(e => {
       console.log('Unable to get conversion rates or access expense data.');
       console.log(e)
       Alert.alert('Unable to get conversion rates or access expense data.');
+      this.updateDisplay({uploading: false});
     });
   }
   render() {
