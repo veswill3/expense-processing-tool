@@ -17,10 +17,10 @@ class ExpenseDetail extends Component {
     super(props);
     // default
     this.state = {
-      location: 'Malaysia',
+      location: 'Philippines',
       date: new Date().toISOString().split('T')[0],
       amount: null,
-      currencyCode: 'MYR',
+      currencyCode: 'PHP',
       category: null,
       comment: '',
       loaded: true // for now...
@@ -95,11 +95,12 @@ class ExpenseDetail extends Component {
               style={{flex: 1}}
               selectedValue={this.state.location}
               onValueChange={(loc) => this.setState({location: loc})}>
-              <Picker.Item label="Malaysia" value="Malaysia" />
-              <Picker.Item label="Singapore" value="Singapore" />
+              <Picker.Item label="Philippines" value="Philippines" />
               <Picker.Item label="Indonesia" value="Indonesia" />
+              <Picker.Item label="Australia" value="Australia" />
+              <Picker.Item label="New Zealand" value="New Zealand" />
               <Picker.Item label="Place to Place" value="Place to Place" />
-              <Picker.Item label="Thailand" value="Thailand" />
+              <Picker.Item label="Malaysia" value="Malaysia" />
             </Picker>
 
             <TextInput
@@ -123,11 +124,12 @@ class ExpenseDetail extends Component {
               style={{width: 100}}
               selectedValue={this.state.currencyCode}
               onValueChange={(code) => this.setState({currencyCode: code})}>
-              <Picker.Item label="MYR" value="MYR" />
-              <Picker.Item label="SGD" value="SGD" />
+              <Picker.Item label="PHP" value="PHP" />
               <Picker.Item label="IDR" value="IDR" />
               <Picker.Item label="USD" value="USD" />
-              <Picker.Item label="THB" value="THB" />
+              <Picker.Item label="AUD" value="AUD" />
+              <Picker.Item label="NZD" value="NZD" />
+              <Picker.Item label="MYR" value="MYR" />
             </Picker>
           </View>
 
@@ -159,11 +161,8 @@ class ExpenseDetail extends Component {
               onChangeText={(text) => this.setState({comment: text})}
             />
           </View>
-          <View
-            style={{backgroundColor: 'pink'}}
-          >
+          <View style={{backgroundColor: 'pink'}}>
             <Text>For debugging...{'\n'}{JSON.stringify(this.state, null, 2)}</Text>
-            
           </View>
 
         </View>
