@@ -12,6 +12,8 @@ import {
   ActivityIndicator
 } from 'react-native';
 
+let debug = false;
+
 class ExpenseDetail extends Component {
   constructor(props) {
     super(props);
@@ -161,10 +163,11 @@ class ExpenseDetail extends Component {
               onChangeText={(text) => this.setState({comment: text})}
             />
           </View>
-          <View style={{backgroundColor: 'pink'}}>
-            <Text>For debugging...{'\n'}{JSON.stringify(this.state, null, 2)}</Text>
-          </View>
-
+          { debug &&
+            <View style={{backgroundColor: 'pink'}}>
+              <Text>For debugging...{'\n'}{JSON.stringify(this.state, null, 2)}</Text>
+            </View>
+          }
         </View>
         <View style={[styles.footer]}>
           <View style={[styles.box]}>

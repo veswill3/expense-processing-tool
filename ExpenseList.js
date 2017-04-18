@@ -24,6 +24,7 @@ class ExpenseList extends Component {
       dataSource: ds.cloneWithRows(['loading']),
       ds: ds,
       uploading: false,
+      uploadStage: null,
     };
     this.updateDisplay();
   }
@@ -51,9 +52,10 @@ class ExpenseList extends Component {
     // });
     // return;
 
-    this.setState({uploading: true});
+    this.setState({uploading: true, uploadStage: 1});
     Promise.all([getConversionRatesPromise(), getExpenseDataPromise()])
     .then(([convRates, expData]) => {
+      this.setState({uploadStage: 2});
       Promise.all(expData.map(store => {
         return new Promise((resolve, reject) => {
           let key = store[0];
@@ -96,14 +98,14 @@ class ExpenseList extends Component {
             }
           }).then(() => AsyncStorage.removeItem(key))
           .catch(e => {
-            // I am not rejecting on purpse - so promise.all will still process the others
+            // I am not rejecting on purpose - so promise.all will still process the others
             console.log('there was an issue uploading an expense.');
             console.log(e);
           });
         });
       }))
       .then(() => {
-        this.updateDisplay({uploading: false});
+        this.updateDisplay({uploading: false, uploadStage: null});
       })
       .catch(e => {
         console.log('there was an issue uploading expenses.');
@@ -122,10 +124,15 @@ class ExpenseList extends Component {
   render() {
     if (this.state.uploading) {
       return (
-        <ActivityIndicator
-          animating={this.state.uploading}
-          size="large"
-        />
+        <View style={{flex: 1, flexDirection: 'column', justifyContent: 'center'}}>
+          <ActivityIndicator
+            animating={this.state.uploading}
+            size="large"
+          />
+          <Text style={{textAlign: 'center'}}>
+            {this.state.uploadStage === 1 ? 'Step 1 - Retrieving currency info' : 'Step 2 - Uploading transactions'}
+          </Text>
+        </View>
       );
     }
     return (
@@ -168,7 +175,11 @@ class ExpenseList extends Component {
                       );
                     }}
                   >
-                    {expData.amount} {expData.currencyCode} {expData.location} {expData.date} [{expData.category}] {expData.comment}
+                    <Text style={{}}>{expData.amount} {expData.currencyCode}</Text>&nbsp;
+                    <Text style={{backgroundColor: '#aaaaff'}}>{expData.location}</Text>&nbsp;
+                    <Text style={{}}>{expData.date}</Text>&nbsp;
+                    <Text style={{backgroundColor: '#aaffdd'}}>{expData.category}</Text>&nbsp;
+                    <Text style={{}}>{expData.comment}</Text>
                   </Text>
                 </View>
               );
@@ -219,7 +230,7 @@ const styles = StyleSheet.create({
   },
   content: {
     marginTop: 50,
-    marginBottom: 40,
+    marginBottom: 60,
   },
   row: {
     flexDirection: 'row',
