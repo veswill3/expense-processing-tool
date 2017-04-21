@@ -61,7 +61,6 @@ class ExpenseDetail extends Component {
     }
   }
   saveExpense() {
-    console.log(this.state);
     if (!this.state.amount) {
       Alert.alert('You forgot an amount');
       return;

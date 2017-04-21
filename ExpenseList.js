@@ -34,7 +34,34 @@ class ExpenseList extends Component {
       if (stores.length === 0) {
         this.setState({dataSource: this.state.ds.cloneWithRows(['No expenses.'])});
       } else {
-        this.setState({dataSource: this.state.ds.cloneWithRows(stores)});
+        // [
+        //   [key, data],
+        //   [key, data],
+        // ]
+        let groupedData = {};
+        let today = new Date().toISOString().split('T')[0],
+            yesterday = new Date(new Date() - 86400000).toISOString().split('T')[0];
+        stores.forEach(([key, data]) => {
+          let groupDate = data.date;
+          if (groupDate === today) {
+            groupDate = 'Today';
+          } else if (groupDate === yesterday) {
+            groupDate = 'Yesterday';
+          }
+          let group = data.location + ' ' + groupDate;
+          if (!(group in groupedData)) {
+            groupedData[group] = {};
+          }
+          groupedData[group][key] = [key, data];
+        });
+        let rowinfo = [];
+        for (group in groupedData) {
+          rowinfo.push(group);
+          for (key in groupedData[group]) {
+            rowinfo.push(groupedData[group][key]);
+          }
+        }
+        this.setState({dataSource: this.state.ds.cloneWithRows(rowinfo)});
       }
       if (newState) {
         this.setState(newState);
@@ -58,12 +85,11 @@ class ExpenseList extends Component {
       this.setState({uploadStage: 2});
       // filter out any expenses that need review
       let filteredExpenseData = expData.filter((store) => {
-        return !JSON.parse(store[1]).needsReview;
+        return !store[1].needsReview;
       });
       Promise.all(filteredExpenseData.map(store => {
         return new Promise((resolve, reject) => {
-          let key = store[0];
-          let d = JSON.parse(store[1]);
+          let [key, d] = store;
           let newAmt = +round(d.amount * 1/convRates['USD' + d.currencyCode], 2).toFixed(2);
           let dateParts = d.date.split('-');
           let params = {
@@ -151,15 +177,15 @@ class ExpenseList extends Component {
             renderRow={(rowData) => {
               if (!rowData) return <View style={[styles.row]}><Text>shucks</Text></View>
               if (typeof rowData === 'string') {
-                return <View style={[styles.row]}><Text>{rowData}</Text></View>
+                return <View style={[styles.row]}><Text style={{fontWeight: 'bold'}}>{rowData}</Text></View>
               }
               if (!rowData[1]) return <View style={[styles.row]}><Text>Nuts</Text></View>
-              let expData = JSON.parse(rowData[1]);
+              let [key, expData] = rowData;
               return (
                 <View style={[styles.row]}>
                   <Text
                     onPress={() => {
-                      this.props.navigator.push({ id: 'detail', title: 'Edit Expense', dataKey: rowData[0]});
+                      this.props.navigator.push({ id: 'detail', title: 'Edit Expense', dataKey: key});
                     }}
                     onLongPress={() => {
                       Alert.alert(
@@ -167,7 +193,7 @@ class ExpenseList extends Component {
                         [
                           {text: 'Cancel', onPress: () => console.log('delete canceled'), style: 'cancel'},
                           {text: 'Confirm', onPress: () => {
-                            AsyncStorage.removeItem(rowData[0]).then(this.updateDisplay())
+                            AsyncStorage.removeItem(key).then(this.updateDisplay())
                             .catch(e => {
                               console.log('there was an issue deleting the expense.');
                               console.log(e);
@@ -181,9 +207,7 @@ class ExpenseList extends Component {
                   >
                     { expData.needsReview && <Text style={{color: 'red'}}>! </Text> }
                     <Text>{expData.amount} {expData.currencyCode}</Text>&nbsp;
-                    <Text style={{backgroundColor: '#aaaaff'}}>{expData.location}</Text>&nbsp;
-                    <Text>{expData.date}</Text>&nbsp;
-                    <Text style={{backgroundColor: '#aaffdd'}}>{expData.category}</Text>&nbsp;
+                    <Text style={styles.category}> {expData.category} </Text>&nbsp;
                     <Text>{expData.comment}</Text>
                   </Text>
                 </View>
@@ -257,6 +281,12 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 4
   },
+  category: {
+    color: '#fff',
+    backgroundColor: '#a2a2a2',
+    borderWidth: 3,
+    borderColor: 'green',
+  },
 });
 
 var getConversionRatesPromise = function() {
@@ -273,6 +303,12 @@ var getExpenseDataPromise = function() {
     AsyncStorage.getAllKeys()
     .then(keys => {
       return AsyncStorage.multiGet(keys);
+    })
+    .then(stores => {
+      // parse the stored data here instead of everywhere!
+      return stores.map(store => {
+        return [store[0], JSON.parse(store[1])];
+      })
     })
     .then(resolve)
     .catch(reject);
