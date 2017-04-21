@@ -7,9 +7,10 @@ import {
   Button,
   Alert,
   Picker,
+  Switch,
   DatePickerAndroid,
   AsyncStorage,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
 
 let debug = false;
@@ -25,6 +26,7 @@ class ExpenseDetail extends Component {
       currencyCode: 'IDR',
       category: null,
       comment: '',
+      needsReview: false,
       loaded: true // for now...
     };
     if (this.props.dataKey) {
@@ -106,7 +108,7 @@ class ExpenseDetail extends Component {
             </Picker>
 
             <TextInput
-              style={styles.txt}
+              style={{flex: 1}}
               value={this.state.date}
               onFocus={this.selectDate.bind(this)}
             />
@@ -115,7 +117,7 @@ class ExpenseDetail extends Component {
 
           <View style={[styles.row]}>
             <TextInput
-              style={styles.txt}
+              style={{width: 90}}
               placeholder="amount"
               keyboardType="numeric"
               value={this.state.amount ? this.state.amount.toString() : null}
@@ -123,7 +125,7 @@ class ExpenseDetail extends Component {
             />
 
             <Picker
-              style={{width: 100}}
+              style={{width: 90}}
               selectedValue={this.state.currencyCode}
               onValueChange={(code) => this.setState({currencyCode: code})}>
               <Picker.Item label="IDR" value="IDR" />
@@ -133,9 +135,7 @@ class ExpenseDetail extends Component {
               <Picker.Item label="MYR" value="MYR" />
               <Picker.Item label="PHP" value="PHP" />
             </Picker>
-          </View>
 
-          <View style={[styles.row]}>
             <Picker
               style={{flex:1}}
               selectedValue={this.state.category}
@@ -157,12 +157,21 @@ class ExpenseDetail extends Component {
 
           <View style={[styles.row]}>
             <TextInput
-              style={styles.txt}
+              style={{flex:1}}
               placeholder="Comment"
               value={this.state.comment}
               onChangeText={(text) => this.setState({comment: text})}
             />
           </View>
+
+          <View style={[styles.row]}>
+            <Switch
+              onValueChange={(value) => this.setState({needsReview: value})}
+              value={this.state.needsReview}
+            />
+            <Text>Hold for review</Text>
+          </View>
+
           { debug &&
             <View style={{backgroundColor: 'pink'}}>
               <Text>For debugging...{'\n'}{JSON.stringify(this.state, null, 2)}</Text>
@@ -216,7 +225,9 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+    marginLeft: 4,
+    marginRight: 4,
   },
   footer: {
     position: 'absolute',
@@ -229,18 +240,8 @@ const styles = StyleSheet.create({
   },
   box: {
     flex: 1,
-    padding: 4
+    padding: 4,
   },
-  txt: {
-    flex: 1,
-    // height: 26,
-    borderWidth: 0.5,
-    borderColor: '#0f0f0f',
-    // flex: 1,
-    fontSize: 13,
-    // padding: 4,
-    margin: 4
-  }
 });
 
 module.exports = ExpenseDetail;

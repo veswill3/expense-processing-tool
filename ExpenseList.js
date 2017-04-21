@@ -56,7 +56,11 @@ class ExpenseList extends Component {
     Promise.all([getConversionRatesPromise(), getExpenseDataPromise()])
     .then(([convRates, expData]) => {
       this.setState({uploadStage: 2});
-      Promise.all(expData.map(store => {
+      // filter out any expenses that need review
+      let filteredExpenseData = expData.filter((store) => {
+        return !JSON.parse(store[1]).needsReview;
+      });
+      Promise.all(filteredExpenseData.map(store => {
         return new Promise((resolve, reject) => {
           let key = store[0];
           let d = JSON.parse(store[1]);
@@ -175,11 +179,12 @@ class ExpenseList extends Component {
                       );
                     }}
                   >
-                    <Text style={{}}>{expData.amount} {expData.currencyCode}</Text>&nbsp;
+                    { expData.needsReview && <Text style={{color: 'red'}}>! </Text> }
+                    <Text>{expData.amount} {expData.currencyCode}</Text>&nbsp;
                     <Text style={{backgroundColor: '#aaaaff'}}>{expData.location}</Text>&nbsp;
-                    <Text style={{}}>{expData.date}</Text>&nbsp;
+                    <Text>{expData.date}</Text>&nbsp;
                     <Text style={{backgroundColor: '#aaffdd'}}>{expData.category}</Text>&nbsp;
-                    <Text style={{}}>{expData.comment}</Text>
+                    <Text>{expData.comment}</Text>
                   </Text>
                 </View>
               );
@@ -267,7 +272,6 @@ var getExpenseDataPromise = function() {
   return new Promise((resolve, reject) => {
     AsyncStorage.getAllKeys()
     .then(keys => {
-      // filter keys here
       return AsyncStorage.multiGet(keys);
     })
     .then(resolve)
