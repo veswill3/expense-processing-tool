@@ -13,17 +13,54 @@ import {
   ActivityIndicator,
 } from 'react-native';
 
-let debug = false;
+const locations = [
+  'Indonesia',
+  'Australia',
+  'New Zealand',
+  'Place to Place',
+  'Malaysia',
+  'Philippines',
+];
+
+const currencyCodes = [
+  'IDR',
+  'USD',
+  'AUD',
+  'NZD',
+  'MYR',
+  'PHP',
+];
+
+const categories = [
+  'Pick a category',
+  'Lodging',
+  'Flight/Bus',
+  'Cab/Metro',
+  'Bar/Alcohol',
+  'Groceries',
+  'Food',
+  'Lunch',
+  'Dinner',
+  'Activity',
+  'Car Rental',
+  'Other',
+];
+
+const debug = false;
+
+function string2PickerItem(item) {
+  return <Picker.Item key={item} label={item} value={item} />
+}
 
 class ExpenseDetail extends Component {
   constructor(props) {
     super(props);
     // default
     this.state = {
-      location: 'Indonesia',
+      location: locations[0],
       date: new Date().toISOString().split('T')[0],
       amount: null,
-      currencyCode: 'IDR',
+      currencyCode: currencyCodes[0],
       category: null,
       comment: '',
       needsReview: false,
@@ -65,7 +102,7 @@ class ExpenseDetail extends Component {
       Alert.alert('You forgot an amount');
       return;
     }
-    if (!this.state.category || this.state.category === 'pick') {
+    if (!this.state.category || this.state.category === categories[0]) {
       Alert.alert('You forgot a category');
       return;
     }
@@ -98,12 +135,7 @@ class ExpenseDetail extends Component {
               style={{flex: 1}}
               selectedValue={this.state.location}
               onValueChange={(loc) => this.setState({location: loc})}>
-              <Picker.Item label="Indonesia" value="Indonesia" />
-              <Picker.Item label="Australia" value="Australia" />
-              <Picker.Item label="New Zealand" value="New Zealand" />
-              <Picker.Item label="Place to Place" value="Place to Place" />
-              <Picker.Item label="Malaysia" value="Malaysia" />
-              <Picker.Item label="Philippines" value="Philippines" />
+              {locations.map(string2PickerItem)}
             </Picker>
 
             <TextInput
@@ -124,33 +156,17 @@ class ExpenseDetail extends Component {
             />
 
             <Picker
-              style={{width: 90}}
+              style={{width: 100}}
               selectedValue={this.state.currencyCode}
               onValueChange={(code) => this.setState({currencyCode: code})}>
-              <Picker.Item label="IDR" value="IDR" />
-              <Picker.Item label="USD" value="USD" />
-              <Picker.Item label="AUD" value="AUD" />
-              <Picker.Item label="NZD" value="NZD" />
-              <Picker.Item label="MYR" value="MYR" />
-              <Picker.Item label="PHP" value="PHP" />
+              {currencyCodes.map(string2PickerItem)}
             </Picker>
 
             <Picker
               style={{flex:1}}
               selectedValue={this.state.category}
               onValueChange={(cat) => this.setState({category: cat})}>
-              <Picker.Item label="Pick a category" value="pick" />
-              <Picker.Item label="Lodging" value="Lodging" />
-              <Picker.Item label="Flight/Bus" value="Flight/Bus" />
-              <Picker.Item label="Cab/Metro" value="Cab/Metro" />
-              <Picker.Item label="Bar/Alcohol" value="Bar/Alcohol" />
-              <Picker.Item label="Groceries" value="Groceries" />
-              <Picker.Item label="Food" value="Food" />
-              <Picker.Item label="Lunch" value="Lunch" />
-              <Picker.Item label="Dinner" value="Dinner" />
-              <Picker.Item label="Activity" value="Activity" />
-              <Picker.Item label="Car Rental" value="Car Rental" />
-              <Picker.Item label="Other" value="Other" />
+              {categories.map(string2PickerItem)}
             </Picker>
           </View>
 
