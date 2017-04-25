@@ -151,8 +151,8 @@ class ExpenseDetail extends Component {
               style={{width: 90}}
               placeholder="amount"
               keyboardType="numeric"
-              value={this.state.amount ? this.state.amount.toString() : null}
-              onChangeText={(amt) => this.setState({amount: amt})}
+              value={this.state.amount ? this.state.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : null}
+              onChangeText={(amt) => this.setState({amount: amt.replace(/,/g,'')})}
             />
 
             <Picker

@@ -206,7 +206,7 @@ class ExpenseList extends Component {
                     }}
                   >
                     { expData.needsReview && <Text style={{color: 'red'}}>! </Text> }
-                    <Text>{expData.amount} {expData.currencyCode}</Text>&nbsp;
+                    <Text>{expData.amount.replace(/\B(?=(\d{3})+(?!\d))/g, ",")} {expData.currencyCode}</Text>&nbsp;
                     <Text style={styles.category}> {expData.category} </Text>&nbsp;
                     <Text>{expData.comment}</Text>
                   </Text>
