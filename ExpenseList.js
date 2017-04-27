@@ -6,6 +6,7 @@ import {
   Button,
   ListView,
   Alert,
+  Image,
   AsyncStorage,
   ActivityIndicator,
 } from 'react-native';
@@ -25,14 +26,15 @@ class ExpenseList extends Component {
       ds: ds,
       uploading: false,
       uploadStage: null,
+      noExpenses: false,
     };
     this.updateDisplay();
   }
-  updateDisplay(newState) {
+  updateDisplay(newState = {}) {
     getExpenseDataPromise()
     .then(stores => {
       if (stores.length === 0) {
-        this.setState({dataSource: this.state.ds.cloneWithRows(['No expenses.'])});
+        newState['noExpenses'] = true;
       } else {
         // [
         //   [key, data],
@@ -61,11 +63,10 @@ class ExpenseList extends Component {
             rowinfo.push(groupedData[group][key]);
           }
         }
-        this.setState({dataSource: this.state.ds.cloneWithRows(rowinfo)});
+        newState['noExpenses'] = false;
+        newState['dataSource'] = this.state.ds.cloneWithRows(rowinfo);
       }
-      if (newState) {
-        this.setState(newState);
-      }
+      this.setState(newState);
     })
     .catch(e => {
       console.log('we had an issue asdfasdfasdfdsaf');
@@ -162,6 +163,35 @@ class ExpenseList extends Component {
           <Text style={{textAlign: 'center'}}>
             {this.state.uploadStage === 1 ? 'Step 1 - Retrieving currency info' : 'Step 2 - Uploading transactions'}
           </Text>
+        </View>
+      );
+    }
+    if (this.state.noExpenses) {
+      // removing the second button causes issues. I have no idea why...
+      return (
+        <View style={[styles.container, {backgroundColor: '#7baaf7'}]}>
+          <View style={[styles.header]}>
+            <Text style={[styles.title]}>{this.props.title}</Text>
+          </View>
+
+          <View style={[{flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}]}>
+            <Image source={require('./ic_zero_inbox.png')} />
+          </View>
+
+          <View style={[styles.footer]}>
+            <View style={[styles.box]}>
+              <Button
+                onPress={() => {this.props.navigator.push({ id: 'detail', title: 'Enter New Expense'});}}
+                title="New Expense 2"
+              />
+            </View>
+            <View style={[styles.box]}>
+              <Button
+                onPress={() => {this.props.navigator.push({ id: 'detail', title: 'Enter New Expense'});}}
+                title="New Expense"
+              />
+            </View>
+          </View>
         </View>
       );
     }
@@ -280,12 +310,6 @@ const styles = StyleSheet.create({
   box: {
     flex: 1,
     padding: 4
-  },
-  category: {
-    color: '#fff',
-    backgroundColor: '#a2a2a2',
-    borderWidth: 3,
-    borderColor: 'green',
   },
 });
 
