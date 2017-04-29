@@ -311,6 +311,12 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 4
   },
+  category: {
+    color: '#fff',
+    backgroundColor: '#a2a2a2',
+    borderWidth: 3,
+    borderColor: 'green',
+  },
 });
 
 var getConversionRatesPromise = function() {
