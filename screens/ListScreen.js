@@ -10,9 +10,14 @@ import {
   AsyncStorage,
   ActivityIndicator,
 } from 'react-native';
-const config = require('./config');
+const config = require('../utilities/config');
 
-class ExpenseList extends Component {
+class ListScreen extends Component {
+  static route = {
+    navigationBar: {
+      visible: false,
+    },
+  };
   constructor(props) {
     super(props);
     const ds = new ListView.DataSource({
@@ -171,23 +176,23 @@ class ExpenseList extends Component {
       return (
         <View style={[styles.container, {backgroundColor: '#7baaf7'}]}>
           <View style={[styles.header]}>
-            <Text style={[styles.title]}>{this.props.title}</Text>
+            <Text style={[styles.title]}>Expense List</Text>
           </View>
 
           <View style={[{flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}]}>
-            <Image source={require('./ic_zero_inbox.png')} />
+            <Image source={require('../assets/images/ic_zero_inbox.png')} />
           </View>
 
           <View style={[styles.footer]}>
             <View style={[styles.box]}>
               <Button
-                onPress={() => {this.props.navigator.push({ id: 'detail', title: 'Enter New Expense'});}}
+                onPress={() => {this.props.navigator.push('detail', {title: 'Enter New Expense'});}}
                 title="New Expense 2"
               />
             </View>
             <View style={[styles.box]}>
               <Button
-                onPress={() => {this.props.navigator.push({ id: 'detail', title: 'Enter New Expense'});}}
+                onPress={() => {this.props.navigator.push('detail', {title: 'Enter New Expense'});}}
                 title="New Expense"
               />
             </View>
@@ -198,7 +203,7 @@ class ExpenseList extends Component {
     return (
       <View style={styles.container}>
         <View style={[styles.header]}>
-          <Text style={[styles.title]}>{this.props.title}</Text>
+          <Text style={[styles.title]}>Expense List</Text>
         </View>
         <View style={[styles.content]}>
 
@@ -215,7 +220,7 @@ class ExpenseList extends Component {
                 <View style={[styles.row]}>
                   <Text
                     onPress={() => {
-                      this.props.navigator.push({ id: 'detail', title: 'Edit Expense', dataKey: key});
+                      this.props.navigator.push('detail', {title: 'Edit Expense', dataKey: key});
                     }}
                     onLongPress={() => {
                       Alert.alert(
@@ -256,7 +261,7 @@ class ExpenseList extends Component {
           </View>
           <View style={[styles.box]}>
             <Button
-              onPress={() => {this.props.navigator.push({ id: 'detail', title: 'Enter New Expense'});}}
+              onPress={() => {this.props.navigator.push('detail', {title: 'Enter New Expense'});}}
               title="New Expense"
             />
           </View>
@@ -364,4 +369,4 @@ function round(value, exp) {
   return +(value[0] + 'e' + (value[1] ? (+value[1] - exp) : -exp));
 }
 
-module.exports = ExpenseList;
+module.exports = ListScreen;

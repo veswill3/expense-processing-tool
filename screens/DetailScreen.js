@@ -52,7 +52,12 @@ function string2PickerItem(item) {
   return <Picker.Item key={item} label={item} value={item} />
 }
 
-class ExpenseDetail extends Component {
+class DetailScreen extends Component {
+  static route = {
+    navigationBar: {
+      visible: false,
+    },
+  };
   constructor(props) {
     super(props);
     // default
@@ -66,10 +71,10 @@ class ExpenseDetail extends Component {
       needsReview: false,
       loaded: true // for now...
     };
-    if (this.props.dataKey) {
+    if (this.props.route.params.dataKey) {
       this.state.loaded = false;
       // load from the datastore
-      AsyncStorage.getItem(this.props.dataKey)
+      AsyncStorage.getItem(this.props.route.params.dataKey)
       .then(data => {
         let expData = JSON.parse(data);
         expData.loaded = true;
@@ -106,9 +111,9 @@ class ExpenseDetail extends Component {
       Alert.alert('You forgot a category');
       return;
     }
-    let key = this.props.dataKey || new Date().toISOString();
+    let key = this.props.route.params.dataKey || new Date().toISOString();
     AsyncStorage.setItem(key, JSON.stringify(this.state))
-      .then(() => this.props.navigator.push({id: 'list', title: 'Expense List'}))
+      .then(() => this.props.navigator.push('list'))
       .catch(e => {
         this.setState({error: e});
         Alert.alert('Something went wrong.\n' + e);
@@ -126,7 +131,7 @@ class ExpenseDetail extends Component {
     return (
       <View style={styles.container}>
         <View style={[styles.header]}>
-          <Text style={[styles.title]}>{this.props.title}</Text>
+          <Text style={[styles.title]}>{this.props.route.params.title}</Text>
         </View>
         <View style={[styles.content]}>
 
@@ -139,7 +144,7 @@ class ExpenseDetail extends Component {
             </Picker>
 
             <TextInput
-              style={{flex: 1}}
+              style={{padding:4, flex: 1}}
               value={this.state.date}
               onFocus={this.selectDate.bind(this)}
             />
@@ -148,7 +153,7 @@ class ExpenseDetail extends Component {
 
           <View style={[styles.row]}>
             <TextInput
-              style={{width: 90}}
+              style={{padding:4, width: 90}}
               placeholder="amount"
               keyboardType="numeric"
               value={this.state.amount ? this.state.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : null}
@@ -172,7 +177,7 @@ class ExpenseDetail extends Component {
 
           <View style={[styles.row]}>
             <TextInput
-              style={{flex:1}}
+              style={{padding:4, flex:1}}
               placeholder="Comment"
               value={this.state.comment}
               onChangeText={(text) => this.setState({comment: text})}
@@ -196,7 +201,7 @@ class ExpenseDetail extends Component {
         <View style={[styles.footer]}>
           <View style={[styles.box]}>
             <Button
-              onPress={() => {this.props.navigator.push({id: 'list', title: 'Expense List'});}}
+              onPress={() => {this.props.navigator.push('list');}}
               title="Cancel"
               color="gray"
             />
@@ -241,8 +246,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: 4,
-    marginRight: 4,
+    margin: 4,
   },
   footer: {
     position: 'absolute',
@@ -259,4 +263,4 @@ const styles = StyleSheet.create({
   },
 });
 
-module.exports = ExpenseDetail;
+module.exports = DetailScreen;
