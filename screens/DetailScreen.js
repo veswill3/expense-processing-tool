@@ -8,10 +8,10 @@ import {
   Alert,
   Picker,
   Switch,
-  DatePickerAndroid,
   AsyncStorage,
   ActivityIndicator,
 } from 'react-native';
+import DatePicker from 'react-native-datepicker';
 
 const locations = [
   'Australia',
@@ -87,21 +87,6 @@ class DetailScreen extends Component {
       });
     }
   }
-  async selectDate() {
-    try {
-      const {action, year, month, day} = await DatePickerAndroid.open({
-        // Use `new Date()` for current date.
-        // May 25 2020. Month 0 is January.
-        date: new Date(this.state.date)
-      });
-      if (action !== DatePickerAndroid.dismissedAction) {
-        // Selected year, month (0-11), day
-        this.setState({date: new Date(year, month, day+1).toISOString().split('T')[0]});
-      }
-    } catch ({code, message}) {
-      console.warn('Cannot open date picker', message);
-    }
-  }
   saveExpense() {
     if (!this.state.amount) {
       Alert.alert('You forgot an amount');
@@ -143,10 +128,10 @@ class DetailScreen extends Component {
               {locations.map(string2PickerItem)}
             </Picker>
 
-            <TextInput
-              style={{padding:4, flex: 1}}
-              value={this.state.date}
-              onFocus={this.selectDate.bind(this)}
+            <DatePicker
+              date={this.state.date}
+              mode="date"
+              onDateChange={(date) => {this.setState({date: date})}}
             />
 
           </View>
