@@ -2,10 +2,8 @@ import Expo from 'expo';
 import React from 'react';
 import {
   Platform,
-  Navigator,
+  StatusBar,
   View,
-  TouchableOpacity,
-  Text,
 } from 'react-native';
 import {
   createRouter,
