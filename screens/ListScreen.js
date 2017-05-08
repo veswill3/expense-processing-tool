@@ -186,13 +186,13 @@ class ListScreen extends Component {
           <View style={[styles.footer]}>
             <View style={[styles.box]}>
               <Button
-                onPress={() => {this.props.navigator.push('detail', {title: 'Enter New Expense'});}}
+                onPress={() => {this.props.navigator.push('detail');}}
                 title="New Expense 2"
               />
             </View>
             <View style={[styles.box]}>
               <Button
-                onPress={() => {this.props.navigator.push('detail', {title: 'Enter New Expense'});}}
+                onPress={() => {this.props.navigator.push('detail');}}
                 title="New Expense"
               />
             </View>
@@ -220,7 +220,7 @@ class ListScreen extends Component {
                 <View style={[styles.row]}>
                   <Text
                     onPress={() => {
-                      this.props.navigator.push('detail', {title: 'Edit Expense', dataKey: key});
+                      this.props.navigator.push('detail', {dataKey: key});
                     }}
                     onLongPress={() => {
                       Alert.alert(
@@ -261,7 +261,7 @@ class ListScreen extends Component {
           </View>
           <View style={[styles.box]}>
             <Button
-              onPress={() => {this.props.navigator.push('detail', {title: 'Enter New Expense'});}}
+              onPress={() => {this.props.navigator.push('detail');}}
               title="New Expense"
             />
           </View>

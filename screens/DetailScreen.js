@@ -131,7 +131,7 @@ class DetailScreen extends Component {
     return (
       <View style={styles.container}>
         <View style={[styles.header]}>
-          <Text style={[styles.title]}>{this.props.route.params.title}</Text>
+          <Text style={[styles.title]}>{this.props.route.params.dataKey ? 'Edit Expense' : 'Enter New Expense'}</Text>
         </View>
         <View style={[styles.content]}>
 
