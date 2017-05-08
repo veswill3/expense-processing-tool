@@ -14,21 +14,21 @@ import {
 } from 'react-native';
 
 const locations = [
-  'Indonesia',
   'Australia',
   'New Zealand',
   'Place to Place',
   'Malaysia',
   'Philippines',
+  'Indonesia',
 ];
 
 const currencyCodes = [
-  'IDR',
-  'USD',
   'AUD',
+  'USD',
   'NZD',
   'MYR',
   'PHP',
+  'IDR',
 ];
 
 const categories = [
