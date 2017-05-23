@@ -14,8 +14,8 @@ import {
 import DatePicker from 'react-native-datepicker';
 
 const locations = [
-  'Australia',
   'New Zealand',
+  'Australia',
   'Place to Place',
   'Malaysia',
   'Philippines',
@@ -23,9 +23,9 @@ const locations = [
 ];
 
 const currencyCodes = [
-  'AUD',
-  'USD',
   'NZD',
+  'USD',
+  'AUD',
   'MYR',
   'PHP',
   'IDR',
@@ -98,7 +98,7 @@ class DetailScreen extends Component {
     }
     let key = this.props.route.params.dataKey || new Date().toISOString();
     AsyncStorage.setItem(key, JSON.stringify(this.state))
-      .then(() => this.props.navigator.push('list'))
+      .then(() => this.props.navigator.replace('list'))
       .catch(e => {
         this.setState({error: e});
         Alert.alert('Something went wrong.\n' + e);
@@ -186,7 +186,7 @@ class DetailScreen extends Component {
         <View style={[styles.footer]}>
           <View style={[styles.box]}>
             <Button
-              onPress={() => {this.props.navigator.push('list');}}
+              onPress={() => {this.props.navigator.replace('list');}}
               title="Cancel"
               color="gray"
             />
